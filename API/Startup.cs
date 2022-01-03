@@ -16,6 +16,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using AutoMapper;
 using API.Helpers;
+using API.MiddleWare;
+using API.Errors;
+using API.Extensions;
 
 namespace API
 {
@@ -37,35 +40,36 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddScoped<IProductRepository,ProductRepository>();
+          
             services.AddAutoMapper(typeof(MappingProfiles)); //add automapper service
-            services.AddScoped(typeof(IGenericRepository<>),(typeof(GenericRepository<>)));
+            
             services.AddControllers();
             services.AddDbContext<StoreContext>(x => 
             x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
            
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-            });
+           services.AddApplicationServices(); //we create a class called applicationservicesextensions in extensions folder to clean start up file
+           services.AddSwaggerDocumentation();
+       
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseMiddleware<ExceptionMiddleware>();
+            /*if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
+
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
-            }
-
+            }*/
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
             app.UseHttpsRedirection();
 
             app.UseRouting();
             app.UseStaticFiles();
             app.UseAuthorization();
-
+            app.UseSwaggerDocumentation(); //we create a class called swaggerservicesextensions in extensions folder to clean start up file
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -13,9 +13,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+   /* [ApiController]
+    [Route("api/[controller]")]*/
+    public class ProductsController : BaseApiController
     {
         private readonly IGenericRepository<ProductBrand> _productBrandRepo;
         private readonly IGenericRepository<ProductType> _productTypeRepo;
@@ -76,6 +76,8 @@ namespace API.Controllers
                ProductType=product.ProductType.Name
 
            };*/
+           if(product==null)
+           return NotFound();
            return _mapper.Map<Product,ProductToReturnDto>(product);
         }
 
