@@ -49,6 +49,16 @@ namespace API
            
            services.AddApplicationServices(); //we create a class called applicationservicesextensions in extensions folder to clean start up file
            services.AddSwaggerDocumentation();
+           services.AddCors(opt=>{
+
+               opt.AddPolicy("CorsPolicy",policy=>{
+
+                   policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https//localhost:5001/");
+
+               });
+               
+           });
+              
        
         }
 
@@ -68,6 +78,7 @@ namespace API
 
             app.UseRouting();
             app.UseStaticFiles();
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
             app.UseSwaggerDocumentation(); //we create a class called swaggerservicesextensions in extensions folder to clean start up file
             app.UseEndpoints(endpoints =>
